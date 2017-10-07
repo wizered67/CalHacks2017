@@ -3,8 +3,11 @@ package com.calhacks.agks.database;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys;
 import org.skife.jdbi.v2.sqlobject.SqlBatch;
+import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
+import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class NutritionDAO {
@@ -19,5 +22,23 @@ public abstract class NutritionDAO {
     public void addMeal(int userId, String name, List<Integer> nutrientIds, List<Float> nutrientAmounts) {
         int id = createMeal(userId, name);
         createMealNutrition(id, nutrientIds, nutrientAmounts);
+    }
+
+    @Mapper(MealInfoMapper.class)
+    @SqlQuery("SELECT id, name FROM Meals WHERE userId = :userId")
+    protected abstract List<MealInfo> getAllMealInfo(@Bind("userId") int userId);
+
+    @Mapper(NutrientInfoMapper.class)
+    @SqlQuery("SELECT nutrientId, Nutrients.name, amount FROM Nutrients, MealNutrition WHERE mealId = :mealId AND nutrientId = Nutrients.id")
+    protected abstract List<NutrientInfo> getAllNutrientInfo(@Bind("mealId") int mealId);
+
+    public List<MealAndNutritionInfo> getAllMealsAndNutritionInfo(int userId) {
+        List<MealAndNutritionInfo> allResults = new ArrayList<>();
+        List<MealInfo> allMealsInfo = getAllMealInfo(userId);
+        for (MealInfo mealInfo : allMealsInfo) {
+            List<NutrientInfo> nutrientsInfo = getAllNutrientInfo(mealInfo.getMealId());
+            allResults.add(new MealAndNutritionInfo(mealInfo.getMealName(), mealInfo.getMealId(), nutrientsInfo));
+        }
+        return allResults;
     }
 }

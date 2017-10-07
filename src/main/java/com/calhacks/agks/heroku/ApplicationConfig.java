@@ -1,5 +1,7 @@
 package com.calhacks.agks.heroku;
 
+import com.calhacks.agks.CustomExceptionMapper;
+import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
 /**
@@ -10,5 +12,7 @@ public class ApplicationConfig extends ResourceConfig {
     public ApplicationConfig() {
         // Register different Binders
         register(new MainBinder());
+        register(new JacksonFeature());
+        register(CustomExceptionMapper.class);
     }
 }
