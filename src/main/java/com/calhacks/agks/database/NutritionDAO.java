@@ -25,7 +25,7 @@ public abstract class NutritionDAO {
     }
 
     @Mapper(MealInfoMapper.class)
-    @SqlQuery("SELECT id, name, whichDay FROM Meals WHERE userId = :userId")
+    @SqlQuery("SELECT id, name, whichDay FROM Meals WHERE userId = :userId ORDER BY whichDay DESC")
     protected abstract List<MealInfo> getAllMealInfo(@Bind("userId") int userId);
 
     @Mapper(NutrientInfoMapper.class)
