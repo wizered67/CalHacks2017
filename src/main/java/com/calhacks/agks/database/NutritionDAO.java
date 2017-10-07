@@ -7,8 +7,11 @@ import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 
+import java.sql.Date;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class NutritionDAO {
     @GetGeneratedKeys
@@ -40,5 +43,36 @@ public abstract class NutritionDAO {
             allResults.add(new MealAndNutritionInfo(mealInfo, nutrientsInfo));
         }
         return allResults;
+    }
+
+    @Mapper(DailyNutrientsTargetMapper.class)
+    @SqlQuery("SELECT nutrientId, Nutrients.name AS nutrientName, amount " +
+            "FROM Nutrients, DailyIntakes, Users " +
+            "WHERE Nutrients.id = nutrientId AND Users.userId = :userId AND Users.sex = DailyIntakes.sex " +
+            "AND Users.age >= DailyIntakes.lowerAge AND Users.age <= DailyIntakes.upperAge")
+    protected abstract List<DailyNutrientsTarget> getDailyNutrientsTargets(@Bind("userId") int userId);
+
+    @Mapper(DailyNutrientsDataMapper.class)
+    @SqlQuery("SELECT nutrientId, Nutrients.name AS nutrientName, SUM(amount), Meals.whichDay " +
+            "FROM MealNutrition, Meals, Nutrients WHERE Meals.userId = :userId, Meals.id = MealNutrition.mealId AND Nutrients.id = nutrientId" +
+            "GROUP BY nutrientId, Meals.whichDay")
+    protected abstract List<DailyNutrientsData> getDailyNutrientsData(@Bind("userId") int userId);
+
+    public List<DailyNutritionDifferences> getDailyNutritionDifferences(int userId) {
+        /*
+        List<DailyNutrientsTarget> dailyNutrientsTargets = getDailyNutrientsTargets(userId);
+        List<DailyNutrientsData> dailyNutrientsDatas = getDailyNutrientsData(userId);
+        List<DailyNutritionDifferences> dailyNutritionDifferences = new ArrayList<>();
+        Map<Date, List<DailyNutritionDifferences>> differencesByDay = new HashMap<>();
+        for (DailyNutrientsData dailyData : dailyNutrientsDatas) {
+            List<DailyNutritionDifferences> differences = differencesByDay.get(dailyData.getDay());
+            if (differences == null) {
+                differences = new ArrayList<>();
+                differencesByDay.put(dailyData.getDay(), differences);
+            }
+            differences.add(new DailyNutritionDifferences())
+        }
+        */
+        return null;
     }
 }
