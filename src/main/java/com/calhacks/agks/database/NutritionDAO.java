@@ -1,5 +1,6 @@
 package com.calhacks.agks.database;
 
+import io.jsonwebtoken.impl.crypto.MacProvider;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys;
 import org.skife.jdbi.v2.sqlobject.SqlBatch;
@@ -7,6 +8,7 @@ import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
 import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 
+import java.security.Key;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +28,15 @@ public abstract class NutritionDAO {
         int id = createMeal(userId, mealName, foodName, date);
         createMealNutrition(id, nutrientIds, nutrientAmounts);
     }
+
+    public final static Key key = MacProvider.generateKey();
+
+    //User Registration
+    @SqlQuery("SELECT username, password FROM Users WHERE username = :username")
+    public abstract List<String> existingAccounts(@Bind("username") String username);
+
+    @SqlBatch("INSERT INTO Users (username, password, age, sex, id) VALUES (:username, password, age, sex)")
+    public abstract void addUser(@Bind("username") String username, @Bind("password") String password, @Bind("age") int age, @Bind("sex") String sex);
 
     //User Authentication
     @SqlQuery("SELECT password FROM Users WHERE userName = :username")

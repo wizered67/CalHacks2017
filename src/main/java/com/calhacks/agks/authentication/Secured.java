@@ -1,4 +1,4 @@
-package com.calhacks.agks;
+package com.calhacks.agks.authentication;
 
 import javax.ws.rs.NameBinding;
 import java.lang.annotation.Retention;
