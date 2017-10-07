@@ -32,18 +32,21 @@ public abstract class NutritionDAO {
     public final static Key key = MacProvider.generateKey();
 
     //User Registration
-    @SqlQuery("SELECT username, password FROM Users WHERE username = :username")
+    @SqlQuery("SELECT username FROM Users WHERE username = :username")
     public abstract List<String> existingAccounts(@Bind("username") String username);
 
     @SqlBatch("INSERT INTO Users (username, password, age, sex, id) VALUES (:username, password, age, sex)")
     public abstract void addUser(@Bind("username") String username, @Bind("password") String password, @Bind("age") int age, @Bind("sex") String sex);
 
     //User Authentication
-    @SqlQuery("SELECT password FROM Users WHERE userName = :username")
-    public abstract List<String> userPassword(@Bind("userName") String userName);
+    @SqlQuery("SELECT password FROM Users WHERE username = :username")
+    public abstract List<String> userPassword(@Bind("username") String username);
 
-    @SqlBatch("INSERT INTO Tokens (userName, token) VALUES (:userName, :token)")
-    public abstract void addToken(@Bind("userName") String userName, @Bind("token") String token);
+    @SqlBatch("INSERT INTO Tokens (username, token, iter, maxIter, timeVal) VALUES (:username, :token, :iter, :maxIter, :timeVal)")
+    public abstract void addToken(@Bind("username") String userName, @Bind("token") String token, @Bind("iter") int iter, @Bind("maxIter") int maxIter, @Bind("timeVal") float timeVal);
+
+    @SqlBatch("DELETE FROM Tokens WHERE username = :username")
+    public abstract void removeToken(@Bind("username") String username);
 
     //Token Authentication
     @SqlQuery("SELECT username FROM tokens WHERE token = :token")

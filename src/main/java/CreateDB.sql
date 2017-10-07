@@ -13,6 +13,14 @@ CREATE TABLE Users (
     PRIMARY KEY(id)
 );
 
+CREATE TABLE Tokens (
+    username varchar(20),
+    token varchar(100),
+    iter int,
+    maxIter int,
+    timeVal float
+)
+
 CREATE TABLE Meals (
     id int NOT NULL AUTO_INCREMENT,
     userId int,
