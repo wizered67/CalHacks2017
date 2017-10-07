@@ -1,5 +1,6 @@
 package com.calhacks.agks;
 
+import com.calhacks.agks.database.NutritionDAO;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.realm.Realm;
@@ -12,6 +13,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
@@ -32,10 +34,12 @@ public abstract class UserAuthentication {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 
-    public Response UserInput(@FormParam("username") String userName, @FormParam("password") String password) {
+    public Response UserInput(@FormParam("username") String userName, @FormParam("password") String password, @Context NutritionDAO nutritionDAO) {
         try {
-            authenticate(userName, password);
+            List<String> passwordList = nutritionDAO.userPassword(userName);
+            authenticate(passwordList, password);
             String token = newToken(userName);
+            nutritionDAO.addToken(userName, token);
             return Response.ok(token).build();
         }
         catch (Exception e) {
@@ -43,10 +47,7 @@ public abstract class UserAuthentication {
         }
     }
 
-    @SqlQuery("SELECT password FROM Users WHERE userName = :username")
-    protected abstract List<String> userPassword(@Bind("userName") String userName);
-    private void authenticate(String userName, String givenPassword) throws Exception{
-        List<String> passwordList = userPassword(userName);
+    private void authenticate(List<String> passwordList, String givenPassword) throws Exception{
         if (passwordList.size() > 1) {
             throw new Exception();
         }
@@ -55,11 +56,8 @@ public abstract class UserAuthentication {
         }
     }
 
-    @SqlBatch("INSERT INTO Tokens (userName, token) VALUES (:userName, :token)")
-    protected abstract void addToken(@Bind("userName") String userName, @Bind("token") String token);
     private String newToken(String userName) {
         String token = Token.EOF_TOKEN.toString();
-        addToken(userName, token);
         return token;
     }
 }

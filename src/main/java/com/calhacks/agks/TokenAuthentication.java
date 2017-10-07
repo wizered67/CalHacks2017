@@ -1,5 +1,6 @@
 package com.calhacks.agks;
 
+import com.calhacks.agks.database.NutritionDAO;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 
@@ -7,6 +8,7 @@ import javax.annotation.Priority;
 import javax.ws.rs.NameBinding;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
@@ -26,7 +28,7 @@ public abstract class TokenAuthentication {
 
     private static final String AUTHENTICATION_SCHEME = "Bearer";
 
-    public void filter(ContainerRequestContext requestContext) throws IOException {
+    public void filter(ContainerRequestContext requestContext, @Context NutritionDAO nutritionDAO) throws IOException {
         String header = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
         if (header == null) {
             abortWithUnauthorized(requestContext);
@@ -37,7 +39,9 @@ public abstract class TokenAuthentication {
             return;
         }
         try{
-            validateToken(header);
+            String token = header.subSequence(7, header.length()).toString();
+            List<String> userNames = nutritionDAO.returnUsername(token);
+            validateToken(userNames);
         }
         catch(Exception e){
             abortWithUnauthorized(requestContext);
@@ -51,8 +55,7 @@ public abstract class TokenAuthentication {
 
     @SqlQuery("SELECT username FROM tokens WHERE token = :token")
     protected abstract List<String> returnUsername(@Bind("token") String token);
-    private void validateToken(String token) throws Exception{
-        List<String> userNames = returnUsername(token);
+    private void validateToken(List<String> userNames) throws Exception{
         if (userNames.size() != 1) {
             throw new Exception();
         }

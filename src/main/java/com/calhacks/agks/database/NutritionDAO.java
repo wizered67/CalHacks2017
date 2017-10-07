@@ -27,6 +27,17 @@ public abstract class NutritionDAO {
         createMealNutrition(id, nutrientIds, nutrientAmounts);
     }
 
+    //User Authentication
+    @SqlQuery("SELECT password FROM Users WHERE userName = :username")
+    public abstract List<String> userPassword(@Bind("userName") String userName);
+
+    @SqlBatch("INSERT INTO Tokens (userName, token) VALUES (:userName, :token)")
+    public abstract void addToken(@Bind("userName") String userName, @Bind("token") String token);
+
+    //Token Authentication
+    @SqlQuery("SELECT username FROM tokens WHERE token = :token")
+    public abstract List<String> returnUsername(@Bind("token") String token);
+
     @Mapper(MealInfoMapper.class)
     @SqlQuery("SELECT id, mealName, foodName, whichDay FROM Meals WHERE userId = :userId ORDER BY whichDay DESC")
     protected abstract List<MealInfo> getAllMealInfo(@Bind("userId") int userId);
