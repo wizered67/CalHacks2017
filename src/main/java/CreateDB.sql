@@ -16,7 +16,8 @@ CREATE TABLE Users (
 CREATE TABLE Meals (
     id int NOT NULL AUTO_INCREMENT,
     userId int,
-    name varchar(30),
+    mealName varchar(30),
+    foodName text,
     whichDay date,
     PRIMARY KEY(id),
     FOREIGN KEY(userId) REFERENCES Users(id)

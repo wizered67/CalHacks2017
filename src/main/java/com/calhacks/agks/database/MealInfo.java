@@ -5,13 +5,15 @@ import java.sql.Date;
 public class MealInfo {
     private int mealId;
     private String mealName;
+    private String foodName;
     private Date date;
 
     public MealInfo() {}
 
-    public MealInfo(int mealId, String mealName, Date date) {
+    public MealInfo(int mealId, String mealName, String foodName, Date date) {
         this.mealId = mealId;
         this.mealName = mealName;
+        this.foodName = foodName;
         this.date = date;
     }
 
@@ -21,6 +23,14 @@ public class MealInfo {
 
     public void setMealId(int mealId) {
         this.mealId = mealId;
+    }
+
+    public String getFoodName() {
+        return foodName;
+    }
+
+    public void setFoodName(String foodName) {
+        this.foodName = foodName;
     }
 
     public String getMealName() {

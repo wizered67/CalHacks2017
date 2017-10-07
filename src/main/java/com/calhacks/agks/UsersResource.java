@@ -13,14 +13,12 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -44,8 +42,9 @@ public class UsersResource {
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode node = mapper.readTree(responseString);
+            JsonNode descNode = node.findValue("desc");
+            String foodName = descNode.get("name").asText();
             JsonNode nutrientsNode = node.findValue("nutrients");
-
             Set<Integer> validNutrients = Sets.newHashSet(301, 203, 320, 401, 324, 323);
             List<Integer> nutrientIds = new ArrayList<>();
             List<Float> nutrientContent = new ArrayList<>();
@@ -59,7 +58,7 @@ public class UsersResource {
                 }
             }
 
-            nutritionDAO.addMeal(id, mealPost.getName(), mealPost.getDate(), nutrientIds, nutrientContent);
+            nutritionDAO.addMeal(id, mealPost.getName(), foodName, mealPost.getDate(), nutrientIds, nutrientContent);
             return Response.ok().build();
         } catch (IOException io) {
 

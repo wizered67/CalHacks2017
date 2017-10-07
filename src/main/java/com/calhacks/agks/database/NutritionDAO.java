@@ -12,20 +12,20 @@ import java.util.List;
 
 public abstract class NutritionDAO {
     @GetGeneratedKeys
-    @SqlUpdate("INSERT INTO Meals (userId, name, whichDay) VALUES (:userId, :name, :date)")
-    protected abstract int createMeal(@Bind("userId") int userId, @Bind("name") String name, @Bind("date") String date);
+    @SqlUpdate("INSERT INTO Meals (userId, mealName, foodName, whichDay) VALUES (:userId, :mealName, :foodName, :date)")
+    protected abstract int createMeal(@Bind("userId") int userId, @Bind("mealName") String name, @Bind("foodName") String foodName, @Bind("date") String date);
 
     @SqlBatch("INSERT INTO MealNutrition (mealId, nutrientId, amount) VALUES (:mealId, :nutrientId, :amount)")
     protected abstract void createMealNutrition(@Bind("mealId") int mealId,
                                                 @Bind("nutrientId") List<Integer> nutrientId, @Bind("amount") List<Float> amount);
 
-    public void addMeal(int userId, String name, String date, List<Integer> nutrientIds, List<Float> nutrientAmounts) {
-        int id = createMeal(userId, name, date);
+    public void addMeal(int userId, String mealName, String foodName, String date, List<Integer> nutrientIds, List<Float> nutrientAmounts) {
+        int id = createMeal(userId, mealName, foodName, date);
         createMealNutrition(id, nutrientIds, nutrientAmounts);
     }
 
     @Mapper(MealInfoMapper.class)
-    @SqlQuery("SELECT id, name, whichDay FROM Meals WHERE userId = :userId ORDER BY whichDay DESC")
+    @SqlQuery("SELECT id, mealName, foodName, whichDay FROM Meals WHERE userId = :userId ORDER BY whichDay DESC")
     protected abstract List<MealInfo> getAllMealInfo(@Bind("userId") int userId);
 
     @Mapper(NutrientInfoMapper.class)
