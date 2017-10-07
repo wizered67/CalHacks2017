@@ -23,6 +23,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Random;
 
@@ -48,7 +49,9 @@ public abstract class UserAuthentication {
             String newPassword = Jwts.builder().setSubject(password).signWith(SignatureAlgorithm.HS256, nutritionDAO.key).compact();
             authenticate(passwordList, newPassword);
             String token = newToken(userName);
-            nutritionDAO.addToken(userName, token);
+            Timestamp curr = new Timestamp(System.currentTimeMillis());
+            long vals = curr.getTime();
+            nutritionDAO.addToken(userName, token, 0, nutritionDAO.maxIter, vals);
             return Response.ok(token).build();
         }
         catch (Exception e) {

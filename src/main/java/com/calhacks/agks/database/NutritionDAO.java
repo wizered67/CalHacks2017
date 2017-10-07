@@ -30,6 +30,7 @@ public abstract class NutritionDAO {
     }
 
     public final static Key key = MacProvider.generateKey();
+    public static int maxIter = 50;
 
     //User Registration
     @SqlQuery("SELECT username FROM Users WHERE username = :username")
