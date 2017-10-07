@@ -12,20 +12,20 @@ import java.util.List;
 
 public abstract class NutritionDAO {
     @GetGeneratedKeys
-    @SqlUpdate("INSERT INTO Meals (userId, name) VALUES (:userId, :name)")
-    protected abstract int createMeal(@Bind("userId") int userId, @Bind("name") String name);
+    @SqlUpdate("INSERT INTO Meals (userId, name, whichDay) VALUES (:userId, :name, :date)")
+    protected abstract int createMeal(@Bind("userId") int userId, @Bind("name") String name, @Bind("date") String date);
 
     @SqlBatch("INSERT INTO MealNutrition (mealId, nutrientId, amount) VALUES (:mealId, :nutrientId, :amount)")
     protected abstract void createMealNutrition(@Bind("mealId") int mealId,
                                                 @Bind("nutrientId") List<Integer> nutrientId, @Bind("amount") List<Float> amount);
 
-    public void addMeal(int userId, String name, List<Integer> nutrientIds, List<Float> nutrientAmounts) {
-        int id = createMeal(userId, name);
+    public void addMeal(int userId, String name, String date, List<Integer> nutrientIds, List<Float> nutrientAmounts) {
+        int id = createMeal(userId, name, date);
         createMealNutrition(id, nutrientIds, nutrientAmounts);
     }
 
     @Mapper(MealInfoMapper.class)
-    @SqlQuery("SELECT id, name FROM Meals WHERE userId = :userId")
+    @SqlQuery("SELECT id, name, whichDay FROM Meals WHERE userId = :userId")
     protected abstract List<MealInfo> getAllMealInfo(@Bind("userId") int userId);
 
     @Mapper(NutrientInfoMapper.class)
@@ -37,7 +37,7 @@ public abstract class NutritionDAO {
         List<MealInfo> allMealsInfo = getAllMealInfo(userId);
         for (MealInfo mealInfo : allMealsInfo) {
             List<NutrientInfo> nutrientsInfo = getAllNutrientInfo(mealInfo.getMealId());
-            allResults.add(new MealAndNutritionInfo(mealInfo.getMealName(), mealInfo.getMealId(), nutrientsInfo));
+            allResults.add(new MealAndNutritionInfo(mealInfo, nutrientsInfo));
         }
         return allResults;
     }

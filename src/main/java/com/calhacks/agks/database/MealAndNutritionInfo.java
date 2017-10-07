@@ -5,31 +5,21 @@ import java.util.List;
 
 @XmlRootElement
 public class MealAndNutritionInfo {
-    private String name;
-    private int mealId;
+    private MealInfo mealInfo;
     private List<NutrientInfo> nutrients;
 
     public MealAndNutritionInfo() {}
-    public MealAndNutritionInfo(String name, int mealId, List<NutrientInfo> nutrients) {
-        this.name = name;
-        this.mealId = mealId;
+    public MealAndNutritionInfo(MealInfo mealInfo, List<NutrientInfo> nutrients) {
+        this.mealInfo = mealInfo;
         this.nutrients = nutrients;
     }
 
-    public String getName() {
-        return name;
+    public MealInfo getMealInfo() {
+        return mealInfo;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getMealId() {
-        return mealId;
-    }
-
-    public void setMealId(int mealId) {
-        this.mealId = mealId;
+    public void setMealInfo(MealInfo mealInfo) {
+        this.mealInfo = mealInfo;
     }
 
     public List<NutrientInfo> getNutrients() {

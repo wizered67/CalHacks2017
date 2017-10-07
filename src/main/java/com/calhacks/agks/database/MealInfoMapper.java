@@ -9,6 +9,6 @@ import java.sql.SQLException;
 public class MealInfoMapper implements ResultSetMapper<MealInfo> {
     @Override
     public MealInfo map(int i, ResultSet resultSet, StatementContext statementContext) throws SQLException {
-        return new MealInfo(resultSet.getInt(1), resultSet.getString(2));
+        return new MealInfo(resultSet.getInt("id"), resultSet.getString("name"), resultSet.getDate("whichDay"));
     }
 }
