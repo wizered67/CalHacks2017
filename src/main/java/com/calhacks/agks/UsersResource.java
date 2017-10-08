@@ -83,7 +83,7 @@ public class UsersResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id}/recommendations")
     @GET
-    public Response getNutritionInfo(@Context NutritionDAO nutritionDAO, @Context SecurityContext securityContext, @PathParam("id") int id) {
+    public Response getNutritionInfo(@Context NutritionDAO nutritionDAO, @Context SecurityContext securityContext, @PathParam("id") int id, @Context @Named("APIKey") String apiKey) {
         checkSameUser(securityContext, id);
         TreeMap<Date, List<DailyNutrientsData>> data = nutritionDAO.getDailyNutritionDifferences(id);
         int i = 0;
@@ -105,7 +105,40 @@ public class UsersResource {
             }
         }
 
-        return Response.ok().build();
+
+
+        TreeMap<Float, Integer> nutrientDiff = new TreeMap<>();
+
+        for (Integer ints : totalCalculations.keySet()) {
+            List<Float> diff = totalCalculations.get(ints);
+            nutrientDiff.put((diff.get(1) - diff.get(0)), ints);
+        }
+
+        String nut1 = nutrientDiff.pollFirstEntry().getValue().toString();
+        String nut2 = nutrientDiff.pollFirstEntry().getValue().toString();
+        String nut3 = nutrientDiff.pollFirstEntry().getValue().toString();
+
+        Client c = ClientBuilder.newClient();
+        String responseString = c.target("https://api.nal.usda.gov/ndb/nutrients/?format=json&api_key=" + apiKey + "&nutrients=" +
+                nut1 + "&nutrients=" + nut2 + "&nutrients=" + nut3 + "&subset=1&max=10").request().get(String.class);
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        ArrayList<String> foods = new ArrayList<>();
+
+        try {
+            JsonNode node = mapper.readTree(responseString);
+            JsonNode foodsNode = node.findValue("foods");
+            JsonNode foodName = foodsNode.get("name");
+            for (int x = 0; x < foodName.size(); x += 1) {
+                foods.add(foodName.get(x).asText());
+            }
+        }
+        catch(IOException io) {
+
+        }
+
+        return Response.ok(foods).build();
     }
 
     private void checkSameUser(SecurityContext securityContext, int id) throws NotAuthorizedException {
