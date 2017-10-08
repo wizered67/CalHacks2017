@@ -33,7 +33,7 @@ public abstract class NutritionDAO {
 
     public final static Key key = MacProvider.generateKey();
     public static int maxIter = 50;
-    public static float timeDiff = 60000;
+    public static float timeDiff = 600000;
 
     //User Registration
     @SqlQuery("SELECT username FROM Users WHERE username = :username")
@@ -56,14 +56,17 @@ public abstract class NutritionDAO {
     @SqlQuery("SELECT username FROM tokens WHERE token = :token")
     public abstract String returnUsername(@Bind("token") String token);
 
+    @SqlQuery("SELECT id FROM Users WHERE username = :username")
+    public abstract String returnId(@Bind("username") String username);
+
     @SqlQuery("SELECT iter FROM tokens WHERE token = :token")
     public abstract int getIter(@Bind("token") String token);
 
-    @SqlQuery("UPDATE tokens SET iter = :iter WHERE token = :token")
-    public abstract int iterate(@Bind("token") String token, @Bind("iter") int iter);
+    @SqlUpdate("UPDATE tokens SET iter = :iter WHERE token = :token")
+    public abstract void iterate(@Bind("token") String token, @Bind("iter") int iter);
 
-    @SqlQuery("UPDATE tokens SET timeVal = :timeVal WHERE token = :token")
-    public abstract float updateTime(@Bind("token") String token, @Bind("timeVal") long timeVal);
+    @SqlUpdate("UPDATE tokens SET timeVal = :timeVal WHERE token = :token")
+    public abstract void updateTime(@Bind("token") String token, @Bind("timeVal") long timeVal);
 
     @SqlQuery("SELECT timeVal FROM tokens WHERE token = :token")
     public abstract float checkTime(@Bind("token") String token);

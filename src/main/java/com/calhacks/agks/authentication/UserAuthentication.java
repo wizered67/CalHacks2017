@@ -42,7 +42,7 @@ import java.util.Random;
 public class UserAuthentication {
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     @Consumes(MediaType.APPLICATION_JSON)
     public static Response UserInput(LoginData loginData, @Context NutritionDAO nutritionDAO) {
         try {
