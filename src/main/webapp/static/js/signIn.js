@@ -1,5 +1,7 @@
 alert("test");
-$( "#login" ).submit(function( event ) {
-   alert( "Handler for .submit() called." );
-   event.preventDefault();
- });
+$(function() {
+	$( "#login" ).submit(function( event ) {
+	   alert( "Handler for .submit() called." );
+	   event.preventDefault();
+	});
+});
