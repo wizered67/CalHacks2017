@@ -27,8 +27,6 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Random;
 
-import static org.apache.shiro.SecurityUtils.securityManager;
-
 //public abstract class UserAuthentication{
 //
 //    Realm realm = org.apache.shiro.mgt.DefaultSecurityManager;

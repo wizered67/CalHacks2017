@@ -71,34 +71,21 @@ public abstract class NutritionDAO {
         return allResults;
     }
 
-    @Mapper(DailyNutrientsTargetMapper.class)
-    @SqlQuery("SELECT nutrientId, Nutrients.name AS nutrientName, amount " +
-            "FROM Nutrients, DailyIntakes, Users " +
-            "WHERE Nutrients.id = nutrientId AND Users.userId = :userId AND Users.sex = DailyIntakes.sex " +
-            "AND Users.age >= DailyIntakes.lowerAge AND Users.age <= DailyIntakes.upperAge")
-    protected abstract List<DailyNutrientsTarget> getDailyNutrientsTargets(@Bind("userId") int userId);
-
     @Mapper(DailyNutrientsDataMapper.class)
-    @SqlQuery("SELECT nutrientId, Nutrients.name AS nutrientName, SUM(amount), Meals.whichDay " +
-            "FROM MealNutrition, Meals, Nutrients WHERE Meals.userId = :userId, Meals.id = MealNutrition.mealId AND Nutrients.id = nutrientId" +
-            "GROUP BY nutrientId, Meals.whichDay")
+    @SqlQuery("SELECT MN.nutrientId, Nutrients.name AS nutrientName, SUM(MN.amount) - DailyTarget.amount AS diff, DailyTarget.amount AS target, Meals.whichDay FROM MealNutrition AS MN, Meals, Nutrients, (SELECT nutrientId, Nutrients.name AS nutrientName, amount FROM Nutrients, DailyIntakes, Users WHERE Nutrients.id = DailyIntakes.nutrientId AND Users.id = :userId AND Users.sex = DailyIntakes.sex AND Users.age >= DailyIntakes.lowerAge AND Users.age <= DailyIntakes.upperAge) AS DailyTarget WHERE Meals.userId = :userId AND Meals.id = MN.mealId AND Nutrients.id = MN.nutrientId AND DailyTarget.nutrientId = MN.nutrientId GROUP BY nutrientId, Meals.whichDay")
     protected abstract List<DailyNutrientsData> getDailyNutrientsData(@Bind("userId") int userId);
 
-    public List<DailyNutritionDifferences> getDailyNutritionDifferences(int userId) {
-        /*
-        List<DailyNutrientsTarget> dailyNutrientsTargets = getDailyNutrientsTargets(userId);
-        List<DailyNutrientsData> dailyNutrientsDatas = getDailyNutrientsData(userId);
-        List<DailyNutritionDifferences> dailyNutritionDifferences = new ArrayList<>();
-        Map<Date, List<DailyNutritionDifferences>> differencesByDay = new HashMap<>();
-        for (DailyNutrientsData dailyData : dailyNutrientsDatas) {
-            List<DailyNutritionDifferences> differences = differencesByDay.get(dailyData.getDay());
-            if (differences == null) {
-                differences = new ArrayList<>();
-                differencesByDay.put(dailyData.getDay(), differences);
+    public Map<Date, List<DailyNutrientsData>> getDailyNutritionDifferences(int userId) {
+        Map<Date, List<DailyNutrientsData>> results = new HashMap<>();
+        List<DailyNutrientsData> data = getDailyNutrientsData(userId);
+        for (DailyNutrientsData d : data) {
+            List<DailyNutrientsData> dayData = results.get(d.getDay());
+            if (dayData == null) {
+                dayData = new ArrayList<>();
+                results.put(d.getDay(), dayData);
             }
-            differences.add(new DailyNutritionDifferences())
+            dayData.add(d);
         }
-        */
-        return null;
+        return results;
     }
 }

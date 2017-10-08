@@ -6,14 +6,16 @@ public class DailyNutrientsData {
     private int nutrientId;
     private String nutrientName;
     private float dailyTotal;
+    private float dailyTarget;
     private Date day;
 
     public DailyNutrientsData() {}
 
-    public DailyNutrientsData(int nutrientId, String nutrientName, float dailyTotal, Date day) {
+    public DailyNutrientsData(int nutrientId, String nutrientName, float dailyTotal, float dailyTarget, Date day) {
         this.nutrientId = nutrientId;
         this.nutrientName = nutrientName;
         this.dailyTotal = dailyTotal;
+        this.dailyTarget = dailyTarget;
         this.day = day;
     }
 
@@ -47,5 +49,13 @@ public class DailyNutrientsData {
 
     public void setNutrientName(String nutrientName) {
         this.nutrientName = nutrientName;
+    }
+
+    public float getDailyTarget() {
+        return dailyTarget;
+    }
+
+    public void setDailyTarget(float dailyTarget) {
+        this.dailyTarget = dailyTarget;
     }
 }

@@ -1,5 +1,6 @@
 package com.calhacks.agks;
 
+import com.calhacks.agks.database.DailyNutrientsData;
 import com.calhacks.agks.database.MealPost;
 import com.calhacks.agks.database.NutritionDAO;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,8 +20,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Path("users/")
@@ -64,5 +67,13 @@ public class UsersResource {
 
         }
         return Response.noContent().build();
+    }
+
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("{id}")
+    @GET
+    public Response getNutritionInfo(@Context NutritionDAO nutritionDAO, @PathParam("id") int id) {
+        Map<Date, List<DailyNutrientsData>> data = nutritionDAO.getDailyNutritionDifferences(id);
+        return Response.ok().build();
     }
 }
