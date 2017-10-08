@@ -168,7 +168,7 @@ public class UsersResource {
         String nut3 = nutrientDiff.pollFirstEntry().getValue().toString();
 
         Client c = ClientBuilder.newClient();
-        String responseString = c.target("https://api.nal.usda.gov/ndb/nutrients/?format=json&api_key=" + apiKey + "&nutrients=" +
+        String responseString = c.target("https://api.nal.usda.gov/ndb/nutrients/?format=json&fg=22&fg=11&api_key=" + apiKey + "&nutrients=" +
                 nut1 + "&nutrients=" + nut2 + "&nutrients=" + nut3 + "&subset=1&max=10").request().get(String.class);
 
         ObjectMapper mapper = new ObjectMapper();
