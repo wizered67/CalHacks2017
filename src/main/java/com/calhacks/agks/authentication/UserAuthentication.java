@@ -20,10 +20,12 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 import java.math.BigInteger;
 import java.sql.Timestamp;
@@ -68,4 +70,14 @@ public class UserAuthentication {
         String token = new BigInteger(16, new Random()).toString();
         return token;
     }
+
+    @Secured
+    @POST
+    @Path("logout")
+    public Response logout(@Context SecurityContext securityContext, @Context NutritionDAO nutritionDAO) {
+        String userId = securityContext.getUserPrincipal().getName();
+        nutritionDAO.removeTokenForUsername(nutritionDAO.getUsernameForUser(userId));
+        return Response.seeOther(UriBuilder.fromPath("/index.html").build()).build();
+    }
+
 }

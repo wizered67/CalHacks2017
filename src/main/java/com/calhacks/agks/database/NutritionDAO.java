@@ -52,6 +52,12 @@ public abstract class NutritionDAO {
     @SqlUpdate("DELETE FROM Tokens WHERE token = :token")
     public abstract void removeToken(@Bind("token") String token);
 
+    @SqlUpdate("DELETE FROM Tokens WHERE Tokens.username = :username")
+    public abstract void removeTokenForUsername(@Bind("username") String username);
+
+    @SqlQuery("SELECT username FROM Users WHERE id = :id")
+    public abstract String getUsernameForUser(@Bind("id") String id);
+
     //Token Authentication
     @SqlQuery("SELECT username FROM tokens WHERE token = :token")
     public abstract String returnUsername(@Bind("token") String token);

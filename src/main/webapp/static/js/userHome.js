@@ -14,6 +14,24 @@ function getCookie(cname) {
     return "";
 }
 
+function logout() {
+     $.ajax({
+           type: "POST",
+           url: "/rest/authentication/logout",
+           headers: {
+               "Authorization" : "Bearer " +  getCookie("access_token")
+           },
+           success: function(data)
+           {
+
+           },
+           failure: function(data)
+           {
+
+           }
+         });
+}
+
 $(function(){
     $( "#recommendButton" ).click(function() {
       $.ajax({
