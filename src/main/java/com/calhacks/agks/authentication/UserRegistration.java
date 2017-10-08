@@ -3,6 +3,7 @@ package com.calhacks.agks.authentication;
 import com.calhacks.agks.database.NutritionDAO;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.mindrot.jbcrypt.BCrypt;
 import org.skife.jdbi.org.antlr.runtime.Token;
 
 import javax.print.attribute.standard.Media;
@@ -39,7 +40,7 @@ public class UserRegistration {
         if (otherAccounts.size() > 0) {
             return Response.status(Response.Status.CONFLICT).build();
         }
-        String newPassword = Jwts.builder().setSubject(password).signWith(SignatureAlgorithm.HS256, nutritionDAO.key).compact();
+        String newPassword = BCrypt.hashpw(password, BCrypt.gensalt());
         nutritionDAO.addUser(username, newPassword, age, sex);
         String token = newToken(username);
         nutritionDAO.addToken(username, token, 0, nutritionDAO.maxIter, vals);

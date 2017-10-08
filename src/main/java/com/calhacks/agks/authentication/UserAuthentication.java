@@ -10,6 +10,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.crypto.RandomNumberGenerator;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.realm.Realm;
+import org.mindrot.jbcrypt.BCrypt;
 import org.skife.jdbi.org.antlr.runtime.Token;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlBatch;
@@ -47,9 +48,10 @@ public class UserAuthentication {
         try {
             String userName = loginData.getUsername();
             String password = loginData.getPassword();
-            String passwordList = nutritionDAO.userPassword(userName);
-            String newPassword = Jwts.builder().setSubject(password).signWith(SignatureAlgorithm.HS256, nutritionDAO.key).compact();
-            authenticate(passwordList, newPassword);
+            String dbPass = nutritionDAO.userPassword(userName);
+            if (!BCrypt.checkpw(password, dbPass)) {
+                throw new Exception();
+            }
             String token = newToken(userName);
             Timestamp curr = new Timestamp(System.currentTimeMillis());
             long vals = curr.getTime();
@@ -58,13 +60,6 @@ public class UserAuthentication {
         }
         catch (Exception e) {
             return Response.status(Response.Status.FORBIDDEN).build();
-        }
-    }
-
-    private static void authenticate(String passwordList, String newPassword) throws Exception{
-
-        if (!passwordList.equals(newPassword)) {
-            throw new Exception();
         }
     }
 
