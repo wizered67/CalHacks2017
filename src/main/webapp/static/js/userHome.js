@@ -15,6 +15,28 @@ function getCookie(cname) {
 }
 
 $(function(){
+    $( "#recommendButton" ).click(function() {
+      $.ajax({
+             type: "GET",
+             url: "/rest/users/" + getCookie("user_id") + "/recommendations/",
+             headers: {
+                 "Authorization" : "Bearer " +  getCookie("access_token")
+             },
+             success: function(data)
+             {
+                var items = [];
+                for (i = 0; i < data.length; i += 1) {
+                    items.push('<li>' + data[i] + '</li>');
+                }
+
+                $("#results").empty().append(items.join('') )
+             },
+             failure: function(data)
+             {
+                 alert("Unable to login. Try again.");
+             }
+           });
+    });
     $('select').change(function(){
         var value = $(this).val();
          var d = $('#addMeal').serializeArray()

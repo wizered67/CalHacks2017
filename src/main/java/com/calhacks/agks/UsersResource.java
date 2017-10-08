@@ -136,9 +136,8 @@ public class UsersResource {
     public Response getNutritionInfo(@Context NutritionDAO nutritionDAO, @Context SecurityContext securityContext, @PathParam("id") int id, @Context @Named("APIKey") String apiKey) {
         checkSameUser(securityContext, id);
         TreeMap<Date, List<DailyNutrientsData>> data = nutritionDAO.getDailyNutritionDifferences(id);
-        int i = 0;
         TreeMap<Integer, List<Float>> totalCalculations = new TreeMap<>();
-
+        int i = 0;
         for (List<DailyNutrientsData> dailyData : data.values()) {
             for (DailyNutrientsData nutrientData : dailyData) {
                 List<Float> totals = totalCalculations.get(nutrientData.getNutrientId());
@@ -179,9 +178,9 @@ public class UsersResource {
         try {
             JsonNode node = mapper.readTree(responseString);
             JsonNode foodsNode = node.findValue("foods");
-            JsonNode foodName = foodsNode.get("name");
-            for (int x = 0; x < foodName.size(); x += 1) {
-                foods.add(foodName.get(x).asText());
+
+            for (int x = 0; x < foodsNode.size(); x += 1) {
+                foods.add(foodsNode.get(x).findValue("name").asText());
             }
         }
         catch(IOException io) {
