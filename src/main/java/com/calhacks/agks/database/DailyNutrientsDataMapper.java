@@ -9,6 +9,6 @@ import java.sql.SQLException;
 public class DailyNutrientsDataMapper implements ResultSetMapper<DailyNutrientsData> {
     @Override
     public DailyNutrientsData map(int i, ResultSet resultSet, StatementContext statementContext) throws SQLException {
-        return new DailyNutrientsData(resultSet.getInt("nutrientId"), resultSet.getString("nutrientName"), resultSet.getFloat("diff"), resultSet.getFloat("target"), resultSet.getDate("whichDay"));
+        return new DailyNutrientsData(resultSet.getInt("nutrientId"), resultSet.getString("nutrientName"), resultSet.getFloat("amount"), resultSet.getFloat("target"), resultSet.getDate("whichDay"));
     }
 }

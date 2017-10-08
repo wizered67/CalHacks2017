@@ -11,9 +11,11 @@ import org.skife.jdbi.v2.sqlobject.customizers.Mapper;
 import java.security.Key;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public abstract class NutritionDAO {
     @GetGeneratedKeys
@@ -72,11 +74,16 @@ public abstract class NutritionDAO {
     }
 
     @Mapper(DailyNutrientsDataMapper.class)
-    @SqlQuery("SELECT MN.nutrientId, Nutrients.name AS nutrientName, SUM(MN.amount) - DailyTarget.amount AS diff, DailyTarget.amount AS target, Meals.whichDay FROM MealNutrition AS MN, Meals, Nutrients, (SELECT nutrientId, Nutrients.name AS nutrientName, amount FROM Nutrients, DailyIntakes, Users WHERE Nutrients.id = DailyIntakes.nutrientId AND Users.id = :userId AND Users.sex = DailyIntakes.sex AND Users.age >= DailyIntakes.lowerAge AND Users.age <= DailyIntakes.upperAge) AS DailyTarget WHERE Meals.userId = :userId AND Meals.id = MN.mealId AND Nutrients.id = MN.nutrientId AND DailyTarget.nutrientId = MN.nutrientId GROUP BY nutrientId, Meals.whichDay")
+    @SqlQuery("SELECT MN.nutrientId, Nutrients.name AS nutrientName, SUM(MN.amount) AS amount, DailyTarget.amount AS target, Meals.whichDay FROM MealNutrition AS MN, Meals, Nutrients, (SELECT nutrientId, Nutrients.name AS nutrientName, amount FROM Nutrients, DailyIntakes, Users WHERE Nutrients.id = DailyIntakes.nutrientId AND Users.id = :userId AND Users.sex = DailyIntakes.sex AND Users.age >= DailyIntakes.lowerAge AND Users.age <= DailyIntakes.upperAge) AS DailyTarget WHERE Meals.userId = :userId AND Meals.id = MN.mealId AND Nutrients.id = MN.nutrientId AND DailyTarget.nutrientId = MN.nutrientId GROUP BY nutrientId, Meals.whichDay")
     protected abstract List<DailyNutrientsData> getDailyNutrientsData(@Bind("userId") int userId);
 
-    public Map<Date, List<DailyNutrientsData>> getDailyNutritionDifferences(int userId) {
-        Map<Date, List<DailyNutrientsData>> results = new HashMap<>();
+    public TreeMap<Date, List<DailyNutrientsData>> getDailyNutritionDifferences(int userId) {
+        TreeMap<Date, List<DailyNutrientsData>> results = new TreeMap<>(new Comparator<Date>() {
+            @Override
+            public int compare(Date o1, Date o2) {
+                return -o1.compareTo(o2);
+            }
+        });
         List<DailyNutrientsData> data = getDailyNutrientsData(userId);
         for (DailyNutrientsData d : data) {
             List<DailyNutrientsData> dayData = results.get(d.getDay());

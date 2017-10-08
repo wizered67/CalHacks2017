@@ -5,6 +5,7 @@ import com.calhacks.agks.database.MealPost;
 import com.calhacks.agks.database.NutritionDAO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import javax.inject.Named;
@@ -22,9 +23,11 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 @Path("users/")
 public class UsersResource {
@@ -70,10 +73,29 @@ public class UsersResource {
     }
 
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("{id}")
+    @Path("{id}/recommendations")
     @GET
     public Response getNutritionInfo(@Context NutritionDAO nutritionDAO, @PathParam("id") int id) {
-        Map<Date, List<DailyNutrientsData>> data = nutritionDAO.getDailyNutritionDifferences(id);
+        TreeMap<Date, List<DailyNutrientsData>> data = nutritionDAO.getDailyNutritionDifferences(id);
+        int i = 0;
+        TreeMap<Integer, List<Float>> totalCalculations = new TreeMap<>();
+
+        for (List<DailyNutrientsData> dailyData : data.values()) {
+            for (DailyNutrientsData nutrientData : dailyData) {
+                List<Float> totals = totalCalculations.get(nutrientData.getNutrientId());
+                if (totals == null) {
+                    totals = Lists.newArrayList(0f, 0f);
+                    totalCalculations.put(nutrientData.getNutrientId(), totals);
+                }
+                totals.set(0, totals.get(0) + nutrientData.getDailyTotal());
+                totals.set(1, totals.get(1) + nutrientData.getDailyTarget());
+            }
+            i += 1;
+            if (i >= 3) {
+                break;
+            }
+        }
+
         return Response.ok().build();
     }
 }
