@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.sun.xml.internal.fastinfoset.algorithm.IEEE754FloatingPointEncodingAlgorithm;
+import javassist.bytecode.stackmap.BasicBlock;
 
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
@@ -77,6 +79,45 @@ public class UsersResource {
 
         }
         return Response.noContent().build();
+    }
+
+    @Secured
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("{id}/recommendations")
+    @GET
+    public Response getFoodInfo(@Context NutritionDAO nutritionDAO, @Context SecurityContext securityContext, @PathParam("id") int id,
+                                @Context @Named("APIKey") String apiKey, String searchTerm) {
+        checkSameUser(securityContext, id);
+        Client c = ClientBuilder.newClient();
+        String response = c.target("https://api.nal.usda.gov/ndb/search/?format=json&q=" + searchTerm + "&sort=n&max=25&offset=0&api_key" + apiKey).request().get(String.class);
+
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayList<String> foods = new ArrayList<>();
+        ArrayList<String> foodsID = new ArrayList<>();
+        try {
+            JsonNode node = mapper.readTree(response);
+            JsonNode itemNode = node.findValue("item");
+            JsonNode mealName = itemNode.get("name");
+            JsonNode foodID = itemNode.get("ndbno");
+
+            for (int i = 0; i < mealName.size(); i += 1) {
+                String text = "";
+                int x = 0;
+                char tempText = mealName.get(i).asText().charAt(x);
+                while (tempText != ',') {
+                    text = text + tempText;
+                    tempText = mealName.get(i).asText().charAt(x++);
+                }
+                if (!foods.contains(text)) {
+                    foods.add(text);
+                    foodsID.add(foodID.get(i).toString());
+                }
+            }
+        }
+        catch (IOException io) {
+
+        }
+        return Response.ok(foods).build();
     }
 
     @Secured
