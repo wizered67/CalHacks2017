@@ -24,6 +24,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.List;
@@ -56,7 +57,7 @@ public class UserAuthentication {
             Timestamp curr = new Timestamp(System.currentTimeMillis());
             long vals = curr.getTime();
             nutritionDAO.addToken(userName, token, 0, nutritionDAO.maxIter, vals);
-            return Response.ok(token).build();
+            return Response.ok().entity(token).build();
         }
         catch (Exception e) {
             return Response.status(Response.Status.FORBIDDEN).build();
