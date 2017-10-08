@@ -93,10 +93,12 @@ public class UsersResource {
 
         ObjectMapper mapper = new ObjectMapper();
         ArrayList<String> foods = new ArrayList<>();
+        ArrayList<String> foodsID = new ArrayList<>();
         try {
             JsonNode node = mapper.readTree(response);
             JsonNode itemNode = node.findValue("item");
             JsonNode mealName = itemNode.get("name");
+            JsonNode foodID = itemNode.get("ndbno");
 
             for (int i = 0; i < mealName.size(); i += 1) {
                 String text = "";
@@ -106,7 +108,10 @@ public class UsersResource {
                     text = text + tempText;
                     tempText = mealName.get(i).asText().charAt(x++);
                 }
-                foods.add(text);
+                if (!foods.contains(text)) {
+                    foods.add(text);
+                    foodsID.add(foodID.get(i).toString());
+                }
             }
         }
         catch (IOException io) {
