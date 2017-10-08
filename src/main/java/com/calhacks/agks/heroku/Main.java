@@ -1,6 +1,7 @@
 package com.calhacks.agks.heroku;
 
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 /**
@@ -18,6 +19,7 @@ public class Main {
         }
 
         final Server server = new Server(Integer.valueOf(webPort));
+
         final WebAppContext root = new WebAppContext();
 
         root.setContextPath("/");
@@ -31,7 +33,6 @@ public class Main {
         final String webappDirLocation = "src/main/webapp/";
         root.setDescriptor(webappDirLocation + "/WEB-INF/web.xml");
         root.setResourceBase(webappDirLocation);
-
         server.setHandler(root);
 
         server.start();

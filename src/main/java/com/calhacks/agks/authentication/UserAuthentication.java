@@ -43,11 +43,11 @@ public class UserAuthentication {
 
     @POST
     @Produces(MediaType.TEXT_PLAIN)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public static Response UserInput(LoginData loginData, @Context NutritionDAO nutritionDAO) {
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public static Response UserInput(@FormParam("username") String userName, @FormParam("password") String password, @Context NutritionDAO nutritionDAO) {
         try {
-            String userName = loginData.getUsername();
-            String password = loginData.getPassword();
+            //String userName = loginData.getUsername();
+            //String password = loginData.getPassword();
             String dbPass = nutritionDAO.userPassword(userName);
             if (!BCrypt.checkpw(password, dbPass)) {
                 throw new Exception();
