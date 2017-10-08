@@ -44,7 +44,7 @@ public class UserRegistration {
         nutritionDAO.addUser(username, newPassword, age, sex);
         String token = newToken(username);
         nutritionDAO.addToken(username, token, 0, nutritionDAO.maxIter, vals);
-        return Response.ok(token).build();
+        return Response.ok(new TokenReceipt(token, nutritionDAO.returnId(username))).build();
     }
 
     private String newToken(String userName) {

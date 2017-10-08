@@ -9,7 +9,8 @@ $(function(){
                data: $("#login").serialize(), // serializes the form's elements.
                success: function(data)
                {
-                   document.cookie='access_token=' + data;
+                   document.cookie='access_token=' + data.token;
+                   document.cookie='user_id=' + data.id;
                    window.location.href = "userHome.html";
                },
                failure: function(data)

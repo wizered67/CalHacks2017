@@ -1,43 +1,48 @@
-
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Python Flask Bucket List App</title>
+<head>
+  <title>Python Flask Bucket List App</title>
 
-   
-    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
-    <link href="/static/css/signup.css" rel="stylesheet">
-    <script src="/static/js/jquery-1.11.2.js"></script>
-    
-   
-  </head>
+  <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <body>
+  <link href="http://getbootstrap.com/examples/jumbotron-narrow/jumbotron-narrow.css" rel="stylesheet">
+  <link href="/static/css/signup.css" rel="stylesheet">
+  <script src="/static/js/jquery-3.2.1.min.js"></script>
+  <script src="/static/js/userHome.js"></script>
 
-    <div class="container">
-      <div class="header">
-        <nav>
-          <ul class="nav nav-pills pull-right">
-            <li role="presentation" class="active"><a href="/logout">Logout</a></li>
-          </ul>
-        </nav>
-        <h3 class="text-muted">Python Flask App</h3>
-      </div>
 
-      <div class="jumbotron">
-        <h1>Welcome Home !!</h1>
-       
-      </div>
+</head>
 
-      
+<body>
 
-      <footer class="footer">
-        <p>&copy; Company 2015</p>
-      </footer>
+<div class="container">
+  <div class="header">
+    <nav>
+      <ul class="nav nav-pills pull-right">
+        <li role="presentation" class="active"><a href="/logout">Logout</a></li>
+      </ul>
+    </nav>
+    <h3 class="text-muted">Python Flask App</h3>
+  </div>
 
-    </div>
-  </body>
+  <div class="jumbotron">
+    <form id="addMeal">
+      <input id="name" name="name" class="form-control" placeholder="Meal Nickname" autocomplete="off" type="text"/>
+      <input id="date" name="date" type="date"/>
+    </form>
+    <input id="search" class="form-control" name="Search Food to Add" placeholder="Search Here" autocomplete="off" autofocus="autofocus" type="text">
+
+    <select id="select"></select>
+    <button id="btnRecommender" class="btn btn-lg btn-primary btn-block" type="button">Recommend me food!</button>
+  </div>
+
+
+
+  <footer class="footer">
+    <p>&copy; Company 2015</p>
+  </footer>
+
+</div>
+</body>
 </html>
-

@@ -43,7 +43,7 @@ import java.util.Random;
 public class UserAuthentication {
 
     @POST
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public static Response UserInput(@FormParam("username") String userName, @FormParam("password") String password, @Context NutritionDAO nutritionDAO) {
         try {
@@ -57,7 +57,7 @@ public class UserAuthentication {
             Timestamp curr = new Timestamp(System.currentTimeMillis());
             long vals = curr.getTime();
             nutritionDAO.addToken(userName, token, 0, nutritionDAO.maxIter, vals);
-            return Response.ok().entity(token).build();
+            return Response.ok().entity(new TokenReceipt(token, nutritionDAO.returnId(userName))).build();
         }
         catch (Exception e) {
             return Response.status(Response.Status.FORBIDDEN).build();

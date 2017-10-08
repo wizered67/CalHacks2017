@@ -2,6 +2,7 @@ package com.calhacks.agks;
 
 import com.calhacks.agks.authentication.Secured;
 import com.calhacks.agks.database.DailyNutrientsData;
+import com.calhacks.agks.database.MealMatch;
 import com.calhacks.agks.database.MealPost;
 import com.calhacks.agks.database.NutritionDAO;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -17,6 +18,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Context;
@@ -72,7 +74,7 @@ public class UsersResource {
             }
 
             nutritionDAO.addMeal(id, mealPost.getName(), foodName, mealPost.getDate(), nutrientIds, nutrientContent);
-            return Response.ok().build();
+            return Response.ok("Food added.").build();
         } catch (IOException io) {
 
         }
@@ -81,23 +83,24 @@ public class UsersResource {
 
     @Secured
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("{id}/recommendations")
+    @Path("{id}/search/")
     @GET
     public Response getFoodInfo(@Context NutritionDAO nutritionDAO, @Context SecurityContext securityContext, @PathParam("id") int id,
-                                @Context @Named("APIKey") String apiKey, String searchTerm) {
+                                @Context @Named("APIKey") String apiKey, @QueryParam("search") String searchTerm) {
         checkSameUser(securityContext, id);
         Client c = ClientBuilder.newClient();
-        String response = c.target("https://api.nal.usda.gov/ndb/search/?format=json&q=" + searchTerm + "&sort=n&max=25&offset=0&api_key" + apiKey).request().get(String.class);
+        String response = c.target("https://api.nal.usda.gov/ndb/search/?format=json&q=" + searchTerm + "&sort=n&max=25&offset=0&api_key=" + apiKey).request().get(String.class);
 
         ObjectMapper mapper = new ObjectMapper();
-        ArrayList<String> foods = new ArrayList<>();
-        ArrayList<String> foodsID = new ArrayList<>();
+        List<MealMatch> mealMatches = new ArrayList<>();
         try {
             JsonNode node = mapper.readTree(response);
             JsonNode itemNode = node.findValue("item");
-            JsonNode mealName = itemNode.get("name");
-            JsonNode foodID = itemNode.get("ndbno");
+            //JsonNode mealName = itemNode.get("name");
+            //JsonNode foodID = itemNode.get("ndbno");
 
+            //iterate over itemNode and get name and nbdno for each
+            /*
             for (int i = 0; i < mealName.size(); i += 1) {
                 String text = "";
                 int x = 0;
@@ -111,11 +114,19 @@ public class UsersResource {
                     foodsID.add(foodID.get(i).toString());
                 }
             }
+            */
+
+            for (int i = 0; i < itemNode.size(); i += 1) {
+                JsonNode n = itemNode.get(i);
+                JsonNode mealName = n.get("name");
+                JsonNode foodID = n.get("ndbno");
+                mealMatches.add(new MealMatch(mealName.asText(), foodID.asText()));
+            }
         }
         catch (IOException io) {
 
         }
-        return Response.ok(foods).build();
+        return Response.ok(mealMatches).build();
     }
 
     @Secured
