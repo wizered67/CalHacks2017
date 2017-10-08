@@ -99,7 +99,14 @@ public class UsersResource {
             JsonNode mealName = itemNode.get("name");
 
             for (int i = 0; i < mealName.size(); i += 1) {
-                foods.add(mealName.get(i).asText());
+                String text = "";
+                int x = 0;
+                char tempText = mealName.get(i).asText().charAt(x);
+                while (tempText != ',') {
+                    text = text + tempText;
+                    tempText = mealName.get(i).asText().charAt(x++);
+                }
+                foods.add(text);
             }
         }
         catch (IOException io) {
