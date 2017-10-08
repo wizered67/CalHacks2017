@@ -13,8 +13,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by Sabrina on 10/7/2017.
@@ -24,11 +26,16 @@ public class UserRegistration {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 
-    public Response userInput(@FormParam("username") String username, @FormParam("password") String password, @FormParam("age") int age, @FormParam("sex") String sex, @Context NutritionDAO nutritionDAO) {
+    public Response userInput(RegistrationData registrationData, @Context NutritionDAO nutritionDAO) {
+        String username = registrationData.getUsername();
+        String password = registrationData.getPassword();
+        int age = registrationData.getAge();
+        String sex = registrationData.getSex();
+
         List<String> otherAccounts = nutritionDAO.existingAccounts(username);
         Timestamp curr = new Timestamp(System.currentTimeMillis());
         long vals = curr.getTime();
-        if (otherAccounts.size() > 1) {
+        if (otherAccounts.size() > 0) {
             return Response.status(Response.Status.CONFLICT).build();
         }
         String newPassword = Jwts.builder().setSubject(password).signWith(SignatureAlgorithm.HS256, nutritionDAO.key).compact();
@@ -39,7 +46,7 @@ public class UserRegistration {
     }
 
     private String newToken(String userName) {
-        String token = Token.EOF_TOKEN.toString();
+        String token = new BigInteger(16, new Random()).toString();
         return token;
     }
 

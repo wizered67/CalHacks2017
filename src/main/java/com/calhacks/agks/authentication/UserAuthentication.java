@@ -43,7 +43,7 @@ public abstract class UserAuthentication {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public static Response UserInput(@FormParam("username") String userName, @FormParam("password") String password, @Context NutritionDAO nutritionDAO) {
         try {
-            List<String> passwordList = nutritionDAO.userPassword(userName);
+            String passwordList = nutritionDAO.userPassword(userName);
             String newPassword = Jwts.builder().setSubject(password).signWith(SignatureAlgorithm.HS256, nutritionDAO.key).compact();
             authenticate(passwordList, newPassword);
             String token = newToken(userName);
@@ -57,18 +57,15 @@ public abstract class UserAuthentication {
         }
     }
 
-    private static void authenticate(List<String> passwordList, String newPassword) throws Exception{
-        if (passwordList.size() > 1) {
-            throw new Exception();
-        }
+    private static void authenticate(String passwordList, String newPassword) throws Exception{
 
-        if (passwordList.get(0) != newPassword) {
+        if (!passwordList.equals(newPassword)) {
             throw new Exception();
         }
     }
 
     private static String newToken(String userName) {
-        String token = Token.EOF_TOKEN.toString();
+        String token = new BigInteger(16, new Random()).toString();
         return token;
     }
 }

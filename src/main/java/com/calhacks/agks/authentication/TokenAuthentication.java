@@ -12,6 +12,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
+import java.security.Timestamp;
 import java.util.List;
 
 @Secured
@@ -19,12 +20,15 @@ import java.util.List;
 @Priority(Priorities.AUTHENTICATION)
 public abstract class TokenAuthentication {
 
+    java.sql.Timestamp curr = new java.sql.Timestamp(System.currentTimeMillis());
+    long currVal = curr.getTime();
+
     private static final String AUTHENTICATION_SCHEME = "Bearer";
 
     public void filter(ContainerRequestContext requestContext, @Context NutritionDAO nutritionDAO) throws IOException {
         String header = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
         if (header == null) {
-            UserAuthentication.UserInput("username", "password", nutritionDAO);
+            abortWithUnauthorized(requestContext);
             return;
         }
         if (!header.toLowerCase().startsWith(AUTHENTICATION_SCHEME.toLowerCase() + " ")){
@@ -33,8 +37,18 @@ public abstract class TokenAuthentication {
         }
         try{
             String token = header.subSequence(7, header.length()).toString();
-            List<String> userNames = nutritionDAO.returnUsername(token);
+            String userNames = nutritionDAO.returnUsername(token);
             validateToken(userNames);
+            int temp = nutritionDAO.getIter(token);
+            if (temp > nutritionDAO.maxIter) {
+                nutritionDAO.removeToken(token);
+                throw new Exception();
+            }
+            if (nutritionDAO.checkTime(token) + nutritionDAO.timeDiff < currVal) {
+                throw new Exception();
+            }
+            nutritionDAO.iterate(token, temp + 1);
+            nutritionDAO.updateTime(token, currVal);
         }
         catch(Exception e){
             abortWithUnauthorized(requestContext);
@@ -46,10 +60,8 @@ public abstract class TokenAuthentication {
         requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).header(HttpHeaders.WWW_AUTHENTICATE, AUTHENTICATION_SCHEME).build());
     }
 
-    private void validateToken(List<String> userNames) throws Exception{
-        if (userNames.size() != 1) {
-            throw new Exception();
-        }
+    private void validateToken(String userNames) throws Exception{
+
         //add something for when it expires
     }
 
@@ -59,4 +71,5 @@ public abstract class TokenAuthentication {
         } else return null;
     }
 }
+
 

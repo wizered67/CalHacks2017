@@ -18,8 +18,8 @@ CREATE TABLE Tokens (
     token varchar(100),
     iter int,
     maxIter int,
-    timeVal float
-)
+    timeVal bigint
+);
 
 CREATE TABLE Meals (
     id int NOT NULL AUTO_INCREMENT,

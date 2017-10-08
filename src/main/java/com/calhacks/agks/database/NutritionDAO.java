@@ -33,6 +33,7 @@ public abstract class NutritionDAO {
 
     public final static Key key = MacProvider.generateKey();
     public static int maxIter = 50;
+    public static float timeDiff = 60000;
 
     //User Registration
     @SqlQuery("SELECT username FROM Users WHERE username = :username")
@@ -43,17 +44,31 @@ public abstract class NutritionDAO {
 
     //User Authentication
     @SqlQuery("SELECT password FROM Users WHERE username = :username")
-    public abstract List<String> userPassword(@Bind("username") String username);
+    public abstract String userPassword(@Bind("username") String username);
 
     @SqlBatch("INSERT INTO Tokens (username, token, iter, maxIter, timeVal) VALUES (:username, :token, :iter, :maxIter, :timeVal)")
     public abstract void addToken(@Bind("username") String userName, @Bind("token") String token, @Bind("iter") int iter, @Bind("maxIter") int maxIter, @Bind("timeVal") float timeVal);
 
-    @SqlBatch("DELETE FROM Tokens WHERE username = :username")
-    public abstract void removeToken(@Bind("username") String username);
+    @SqlBatch("DELETE FROM Tokens WHERE token = :token")
+    public abstract void removeToken(@Bind("token") String token);
 
     //Token Authentication
     @SqlQuery("SELECT username FROM tokens WHERE token = :token")
-    public abstract List<String> returnUsername(@Bind("token") String token);
+    public abstract String returnUsername(@Bind("token") String token);
+
+    @SqlQuery("SELECT iter FROM tokens WHERE token = :token")
+    public abstract int getIter(@Bind("token") String token);
+
+    @SqlQuery("UPDATE tokens SET iter = :iter WHERE token = :token")
+    public abstract int iterate(@Bind("token") String token, @Bind("iter") int iter);
+
+    @SqlQuery("UPDATE tokens SET timeVal = :timeVal WHERE token = :token")
+    public abstract float updateTime(@Bind("token") String token, @Bind("timeVal") long timeVal);
+
+    @SqlQuery("SELECT timeVal FROM tokens WHERE token = :token")
+    public abstract float checkTime(@Bind("token") String token);
+
+
 
     @Mapper(MealInfoMapper.class)
     @SqlQuery("SELECT id, mealName, foodName, whichDay FROM Meals WHERE userId = :userId ORDER BY whichDay DESC")
