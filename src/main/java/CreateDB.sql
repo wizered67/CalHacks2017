@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS Nutrients;
 CREATE TABLE Users (
     id int NOT NULL AUTO_INCREMENT,
     username varchar(20),
-    password varchar(20),
+    password varchar(255),
     age int,
     sex ENUM("M", "F"),
     PRIMARY KEY(id)

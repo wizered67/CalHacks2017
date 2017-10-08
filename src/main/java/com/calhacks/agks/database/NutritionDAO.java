@@ -39,17 +39,17 @@ public abstract class NutritionDAO {
     @SqlQuery("SELECT username FROM Users WHERE username = :username")
     public abstract List<String> existingAccounts(@Bind("username") String username);
 
-    @SqlBatch("INSERT INTO Users (username, password, age, sex, id) VALUES (:username, password, age, sex)")
+    @SqlUpdate("INSERT INTO Users (username, password, age, sex) VALUES (:username, :password, :age, :sex)")
     public abstract void addUser(@Bind("username") String username, @Bind("password") String password, @Bind("age") int age, @Bind("sex") String sex);
 
     //User Authentication
     @SqlQuery("SELECT password FROM Users WHERE username = :username")
     public abstract String userPassword(@Bind("username") String username);
 
-    @SqlBatch("INSERT INTO Tokens (username, token, iter, maxIter, timeVal) VALUES (:username, :token, :iter, :maxIter, :timeVal)")
+    @SqlUpdate("INSERT INTO Tokens (username, token, iter, maxIter, timeVal) VALUES (:username, :token, :iter, :maxIter, :timeVal)")
     public abstract void addToken(@Bind("username") String userName, @Bind("token") String token, @Bind("iter") int iter, @Bind("maxIter") int maxIter, @Bind("timeVal") float timeVal);
 
-    @SqlBatch("DELETE FROM Tokens WHERE token = :token")
+    @SqlUpdate("DELETE FROM Tokens WHERE token = :token")
     public abstract void removeToken(@Bind("token") String token);
 
     //Token Authentication

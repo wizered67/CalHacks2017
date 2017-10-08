@@ -17,6 +17,7 @@ import org.skife.jdbi.v2.sqlobject.SqlQuery;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
@@ -37,12 +38,15 @@ import java.util.Random;
 //}
 
 @Path("/authentication")
-public abstract class UserAuthentication {
+public class UserAuthentication {
 
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public static Response UserInput(@FormParam("username") String userName, @FormParam("password") String password, @Context NutritionDAO nutritionDAO) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    public static Response UserInput(LoginData loginData, @Context NutritionDAO nutritionDAO) {
         try {
+            String userName = loginData.getUsername();
+            String password = loginData.getPassword();
             String passwordList = nutritionDAO.userPassword(userName);
             String newPassword = Jwts.builder().setSubject(password).signWith(SignatureAlgorithm.HS256, nutritionDAO.key).compact();
             authenticate(passwordList, newPassword);
